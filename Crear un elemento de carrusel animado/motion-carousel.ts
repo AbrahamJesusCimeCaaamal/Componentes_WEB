@@ -9,8 +9,7 @@ export class MotionCarousel extends LitElement {
   private selectedInternal = 0;
   @property({type: Number})
   selected = 0;
-//El carrusel ahora muestra su primer elemento secundario, pero no hay forma
-// de cambiar lo que se muestra. Necesita una selectedpropiedad para controlar qué elemento se muestra.
+
   get maxSelected() {
     return this.childElementCount - 1;
   }
@@ -18,17 +17,33 @@ export class MotionCarousel extends LitElement {
   hasValidSelected() {
     return this.selected >= 0 && this.selected <= this.maxSelected;
   }
-//selected cualquier valor, pero solo es una selección 
-//válida si es un número en el rango del número total de elementos en el carrusel
+  // elementos slotpara gestionar la visualización del elemento seleccionado.
+
   render() {
     if (this.hasValidSelected()) {
       this.selectedInternal = this.selected;
     }
+    // name atributo de slotpara selectedque solo se muestre el elemento seleccionado.
     return html`
       <div class="fit">
-        <slot></slot>
+        <slot name="selected"></slot>
       </div>
     `;
+  }
+
+  private previous = 0;
+  //El updatedmétodo primero verifica si necesita hacer algún trabajo, 
+  //usando el changedPropertiesargumento y el resultado de hasValidSelected().
+  protected updated(changedProperties: PropertyValues) {
+    if (changedProperties.has('selected') && this.hasValidSelected()) {
+      this.updateSlots();
+      this.previous = this.selected;
+    }
+  }
+
+  private updateSlots() {
+    this.children[this.previous]?.removeAttribute('slot');
+    this.children[this.selected]?.setAttribute('slot', 'selected');
   }
 
 }
