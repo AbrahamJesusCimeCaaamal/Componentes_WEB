@@ -1,7 +1,7 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import {dateConverter} from './date-converter.js';
-
+//completo convertir date
 @customElement('date-display')
 export class DateDisplay extends LitElement {
   @property({converter: dateConverter(navigator.language), reflect: true})
