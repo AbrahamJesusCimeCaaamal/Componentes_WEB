@@ -1,16 +1,21 @@
-import {LitElement, html} from 'lit';
+import {LitElement, html, PropertyValues} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-import {dateConverter} from './date-converter.js';
 
-//Los componentes web pueden recibir datos de muchas maneras,
-// pero una de las formas más comunes es usar un atributo porque los atributos son declarativos,
+//La datepropiedad se establece en index.html, utilizando JavaScript. 
+//La datepropiedad no se puede establecer desde un atributo, 
+//porque Lit no tiene un convertidor de atributos incorporado para
+// convertir una fecha de cadena en un Dateobjeto
 
 @customElement('date-display')
-//El Dateobjeto se pasa como una propiedad de JavaScript en
-// index.html lugar de un atributo de cadena legible.
 export class DateDisplay extends LitElement {
-  @property({converter: dateConverter})
+  @property({attribute: false})
   date = new Date();
+
+  @property({type: String, attribute: 'date-str'})
+  dateStr = '';
+
+//Los convertidores de atributos le dicen a Lit cómo convertir un atributo
+// en una propiedad y, en el caso de que una propiedad reactiva tenga la reflect: true bandera
 
   render() {
     const locale = 'en-US';
