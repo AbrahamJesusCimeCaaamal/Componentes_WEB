@@ -1,8 +1,7 @@
 import type {SVGTemplateResult} from "lit";
-
 import {LitElement, html, svg, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-
+//Renderizar SVG con encendido
 //CSS puede aplicar atributos de presentación a elementos
 // SVG de forma similar a como CSS aplica atributos a HTML.
 const themeCSS = css
