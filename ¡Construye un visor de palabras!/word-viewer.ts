@@ -10,7 +10,6 @@ import { classMap } from 'lit/directives/class-map.js';
 //El @customElement decorador de TypeScript es una forma
 // abreviada del equivalente JavaScript de llamar customElements.
 
-
 @customElement('word-viewer')
 class WordViewer extends LitElement {
   static styles = css`
@@ -28,7 +27,7 @@ class WordViewer extends LitElement {
       background-color: violet;
     }
   `
-//cuando this.playDirection === -1, el <pre>elemento ganará la clase backwards
+
   @state() private playDirection: -1 | 1 = 1;
   @state() private idx = 0;
   @property() words = 'initial value';
@@ -37,7 +36,7 @@ class WordViewer extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.intervalTimer = setInterval(this.tickToNextWord, 1000);
+    this.intervalTimer = setInterval(this.tickToNextWord, 250);
   }
 
   disconnectedCallback() {
