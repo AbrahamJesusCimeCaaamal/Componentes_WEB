@@ -12,12 +12,32 @@ class WordViewer extends LitElement {
   @property() words = 'initial value';
 //el componente programa una actualización. De forma predeterminada, Lit configura la sincronización de
 // atributos para la propiedad y actualizará la propiedad cuando cambie el atributo.
-  render() {
-    //El estado reactivo interno se refiere a las propiedades
-    // reactivas que no forman parte de la API pública del componente.
-    const splitWords = this.words.split('.');
-    //% operador mantendrá el índice resultante dentro de los límites de la splitWordsmatriz.
-    const word = splitWords[this.idx % splitWords.length];
-    return html`<pre>${word}</pre>`;
-  }
+private intervalTimer?: number;
+  
+//setInterval, una función de navegador que llama repetidamente 
+//a una función con un retraso fijo entre cada llamada.
+connectedCallback() {
+    //connectedCallbackse invoca cuando el componente se agrega al DOM 
+    super.connectedCallback();
+  this.intervalTimer = setInterval(this.tickToNextWord, 1000);
 }
+//connectedCallback se invoca y setIntervalllama repetidamente this.tickToNextWordcada 1000 ms o cada segundo.
+disconnectedCallback() {
+    // disconnectedCallback se invoca cuando el componente se elimina del DOM.
+  
+  super.disconnectedCallback();
+  clearInterval(this.intervalTimer);
+  this.intervalTimer = undefined;
+}
+//word-viewerse elimina del DOM, disconnectedCallback se invoca limpiando el intervalo 
+//y this.tickToNextWordya no se llama.
+
+render() {
+  const splitWords = this.words.split('.');
+  const word = splitWords[this.idx % splitWords.length];
+  return html`<pre>${word}</pre>`;
+}
+
+tickToNextWord = () => { this.idx += 1; };
+}
+
