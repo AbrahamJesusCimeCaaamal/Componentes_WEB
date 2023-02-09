@@ -2,8 +2,12 @@ import {LitElement, html} from 'lit';
 import {customElement, state} from 'lit/decorators.js';
 import {map} from 'lit/directives/map.js';
 
+//Use la map() para una forma declarativa de tomar un elemento iterable y
+// transformar cada elemento en una plantilla renderizable.
+// Úselo cuando todo el estado necesario esté controlado por Lit.
 @customElement('my-element')
 class MyElement extends LitElement {
+    //cada elemento de la lista obtiene una función que llama _deleteThingcon su propio índice.
   @state()
   things = [
     "Raindrops on roses",
