@@ -1,11 +1,7 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
-
-// La actualización de una propiedad reactiva puede
-// desencadenar un ciclo de actualización reactiva, 
-//que a su vez produce efectos secundarios, como volver 
-//a representar el elemento y actualizar sus atributos.
-
+//Una propiedad reactiva es una propiedad que activa el 
+//componente para que se actualice cada vez que cambia el valor de la propiedad.
 @customElement('my-element')
 export class MyElement extends LitElement {
   @property()
@@ -18,7 +14,8 @@ export class MyElement extends LitElement {
       this.result = 'Tails';
     }
   }
-
+//resultpero no es reactiva. Presionar el botón cambia el 
+//valor de la propiedad, pero el componente nunca cambia su visualización
   render() {
     return html`
       <button @click=${this.flipCoin}>Flip a coin!</button>
