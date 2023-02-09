@@ -1,19 +1,11 @@
-import {LitElement, html, PropertyValues} from 'lit';
+import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
+import {dateConverter} from './date-converter.js';
 
 @customElement('date-display')
 export class DateDisplay extends LitElement {
-  @property({attribute: false})
+  @property({converter: dateConverter(navigator.language), reflect: true})
   date = new Date();
-//dateStr, que acepta una cadena.
-  @property({type: String, attribute: 'date-str'})
-  dateStr = '';
-//willUpdate es un poco desordenado e imperativo.
-  willUpdate(changed: PropertyValues<this>) {
-    if (changed.has('dateStr') && this.dateStr) {
-      this.date = new Date(this.dateStr);
-    }
-  }
 
   render() {
     const locale = 'en-US';
