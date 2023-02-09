@@ -1,12 +1,21 @@
 import {LitElement, html, PropertyValues} from 'lit';
-import {customElement, property} from 'lit/decorators.js';
+import {customElement, property, query} from 'lit/decorators.js';
 import {styles} from './styles.js';
 import {styleMap} from 'lit/directives/style-map.js';
-@customElement('motion-carousel')
 
-//un elemento de "contenedor" que rodea los elementos que se animarán a la izquierda o a la derecha.
+//Las ranuras deben actualizarse para representar correctamente
+// los elementos seleccionados anteriormente y actualmente.
+
+@customElement('motion-carousel')
 export class MotionCarousel extends LitElement {
   static styles = styles;
+ //El @querydecorador proporciona un acceso conveniente a los slotelementos.
+ //Esto se usará para ver su archivo assignedElements.
+  @query('slot[name="selected"]', true)
+  private selectedSlot!: HTMLSlotElement;
+
+  @query('slot[name="previous"]', true)
+  private previousSlot!: HTMLSlotElement;
 
   private selectedInternal = 0;
   @property({type: Number})
@@ -28,8 +37,6 @@ export class MotionCarousel extends LitElement {
     const animateLeft = ``;
     const selectedLeft = ``;
     const previousLeft = ``;
-    //El @click controlador ahora tiene más sentido en el "contenedor", 
-    //por lo que no se pierden clics
     return html`
       <div class="fit"
         @click=${this.clickHandler}
@@ -52,9 +59,10 @@ export class MotionCarousel extends LitElement {
       {detail: this.selected, bubbles: true, composed: true});
     this.dispatchEvent(change);
   }
-//El selectedelemento no se mostrará después de este cambio en la plantilla.
-// Eso es porque se mueve por debajo de la ranura anterior.
+
   private previous = 0;
+  //El updateSlotsmétodo elimina los elementos actualmente asignados y
+  // luego coloca los elementos para los valores previousy selected.
   protected updated(changedProperties: PropertyValues) {
     if (changedProperties.has('selected') && this.hasValidSelected()) {
       this.updateSlots();
@@ -63,7 +71,11 @@ export class MotionCarousel extends LitElement {
   }
 
   private updateSlots() {
-    this.children[this.previous]?.removeAttribute('slot');
+    // unset old slot state
+    this.selectedSlot.assignedElements()[0]?.removeAttribute('slot');
+    this.previousSlot.assignedElements()[0]?.removeAttribute('slot');
+    // set slots
+    this.children[this.previous]?.setAttribute('slot', 'previous');
     this.children[this.selected]?.setAttribute('slot', 'selected');
   }
 
