@@ -1,25 +1,28 @@
 import {LitElement, html} from 'lit';
+import {map} from 'lit/directives/map.js';
 import {customElement, property} from 'lit/decorators.js';
-//Una propiedad reactiva es una propiedad que activa el 
-//componente para que se actualice cada vez que cambia el valor de la propiedad.
+
+// Lit utiliza una verificación de desigualdad estricta ( !==) 
+//para determinar si una propiedad ha cambiado. Si muta un 
+//objeto o matriz existente, Lit no detectará ningún cambio.
+
 @customElement('my-element')
 export class MyElement extends LitElement {
   @property()
-  result: string = '';
+  //groceri es ahora es una nueva matriz, el cambio desencadena una actualización
+  groceries = ['tea', 'milk', 'honey', 'chocolate'];
 
-  flipCoin() {
-    if (Math.random() < 0.5) {
-      this.result = 'Heads';
-    } else {
-      this.result = 'Tails';
-    }
+  removeItem(item: string) {
+    const indexToRemove = this.groceries.indexOf(item);
+    this.groceries =
+        this.groceries.filter((_, i) => i !== indexToRemove);
   }
-//resultpero no es reactiva. Presionar el botón cambia el 
-//valor de la propiedad, pero el componente nunca cambia su visualización
+
   render() {
     return html`
-      <button @click=${this.flipCoin}>Flip a coin!</button>
-      <p>Result: ${this.result}</p>
+      ${map(this.groceries, (item) =>
+        html`<button @click=${() => this.removeItem(item)}>x</button>  ${item}<br>`
+      )}
     `;
   }
 }
