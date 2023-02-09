@@ -1,42 +1,47 @@
-import {LitElement, html, PropertyValues} from 'lit';
-import {customElement, property} from 'lit/decorators.js';
+import {LitElement, html, css, PropertyValues} from 'lit';
+import {customElement, state, query} from 'lit/decorators.js';
 
 @customElement('my-element')
 export class MyElement extends LitElement {
-  @property() forward = '';
-  @property() backward = '';
-
-  //willUpdate() devolución de llamada es el lugar 
-  //ideal para hacer estos cálculos en Lit. Se llama 
-  //cerca del comienzo del ciclo de actualización, antes de que se represente el componente
-
-
-  //La willUpdate() devolución de llamada recibe un mapa de propiedades cambiadas como argumento.
-  willUpdate(changedProperties: PropertyValues<this>) {
-    if (changedProperties.has('forward')) {
-      this.backward = this.forward.split('').reverse().join('');
+  static styles = css`
+    :host {
+      display: block;
     }
-
-    if (changedProperties.has('backward')) {
-      this.forward = this.backward.split('').reverse().join('');
+    #message {
+      position: fixed;
+      background-color: cornflowerblue;
+      color: white;
+      padding: 10px;
     }
-  }
+  `;
+  @state()
+  _showMessage = false;
 
-  onInput(e: Event) {
-    const inputEl = e.target as HTMLInputElement;
-    if (inputEl.id === 'forward') {
-      this.forward = inputEl.value;
-    } else {
-      this.backward = inputEl.value;
-    }
-  }
+  @query('#message')
+  _message!: HTMLDivElement;
 
   render() {
     return html`
-      <label>Forward: <input id="forward" @input=${this.onInput} .value=${this.forward}></label>
-      <label>Backward: <input id="backward" @input=${this.onInput} .value=${this.backward}></label>
-      <div>Forward text: ${this.forward}</div>
-      <div>Backward text: ${this.backward}</div>
+      <button @click=${() => this._showMessage = !this._showMessage}>Click me</button>
+      <div id="message" ?hidden=${!this._showMessage}>
+        TADA
+      </div>
     `;
+  }
+//medir el componente después de la actualización para 
+//realizar una acción imperativa como una animación. 
+//Hay una devolución de llamada para eso y, como era de esperar, se llama updated()
+  protected updated(changedProperties: PropertyValues<this>): void {
+    if (changedProperties.has('_showMessage')) {
+      const final = this._message.getBoundingClientRect().width;
+      const starting = 0 - final;
+      this._message.animate([
+        { transform: `translateX(${starting}px)` },
+        { transform: `translateX(0)` }
+      ], {
+        duration: 500,
+        easing: 'ease-out',
+      });
+    }
   }
 }
