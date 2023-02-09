@@ -1,27 +1,47 @@
 import {LitElement, html} from 'lit';
 import {customElement, state} from 'lit/decorators.js';
-
-
-
+import type {TemplateResult} from 'lit';
 
 @customElement('my-element')
 class MyElement extends LitElement {
   @state()
-  names = ['Chandler', 'Phoebe', 'Joey', 'Monica', 'Rachel', 'Ross'];
-//Utilice el filter()método de matriz para mantener solo los nombres que 
-//incluyen la letra "e" seguida de una map()llamada de método de matriz para generar una matriz de 
-//resultados de plantilla para colocar en la plantilla del componente.
+  friends = ['Harry', 'Ron', 'Hermione'];
 
+  @state()
+  pets = [
+    { name: "Hedwig", species: "Owl" },
+    { name: "Scabbers", species: "Rat" },
+    { name: "Crookshanks", species: "Cat" },
+  ];
+
+  @state()
+  includePets = true;
+
+  //render()  en su propio método privado que devuelve la matriz de plantillas.
+  // Luego invoque el nuevo método dentro de la expresión de la plantilla (reemplazando listItems).
   render() {
+    const listItems: TemplateResult[] = [];
+    this.friends.forEach((friend) => {
+      listItems.push(html`<li>${friend}</li>`);
+    });
+    if (this.includePets) {
+      this.pets.forEach((pet) => {
+        listItems.push(html`<li>${pet.name} (${pet.species})</li>`);
+      });
+    }
+
     return html`
-      <p>A list of names that include the letter "e"</p>
+      <button @click=${() => this._togglePetVisibility()}>
+        ${this.includePets ? 'Hide' : 'Show'} pets
+      </button>
+      <p>My magical friends</p>
       <ul>
-      ${this.names
-        //matriz es útil cuando se encadena de esta manera,
-        // pero requiere que la fuente original sea una matriz.
-        .filter((name) => name.match(/e/i))
-        .map((name) => html`<li>${name}</li>`)}
+        ${listItems}
       </ul>
     `;
+  }
+
+  private _togglePetVisibility() {
+    this.includePets = !this.includePets;
   }
 }
