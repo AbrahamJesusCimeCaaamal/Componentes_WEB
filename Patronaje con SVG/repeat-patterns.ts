@@ -3,6 +3,12 @@ import type {SVGTemplateResult} from "lit";
 import {LitElement, html, svg} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 
+
+//La patternUnits propiedad define la geometría de coordenadas 
+//relativa utilizada para pintar un patrón. El ajuste patternUnits 
+//hace userSpaceOnUse/que la geometría sea relativa al espacio del
+// usuario. En este caso, el espacio de usuario es el DOM.
+
 const createElement = (chars: string): SVGTemplateResult => svg`
   <text
     id="chars"
@@ -12,9 +18,7 @@ const createElement = (chars: string): SVGTemplateResult => svg`
     ${chars}
   </text>
 `;
-//Las rutas de recorte son polígonos que se utilizan para restringir dónde se 
-//"pintan" los elementos. En SVG, una ruta de clip se define con el <clipPath>elemento.
-
+//modificar llamados con cantidades
 const createMotif = (
   numPrints: number,
   offset: number = 0,
@@ -47,8 +51,7 @@ const createTileBoundary = () => svg`
     <rect width="200" height="200"></rect>
   </clipPath>
 `;
-//Esta función utilizará el motivo y clipPath ahora 
-//disponibles al <defs>hacer referencia #motifen un <use>elemento y url(#rect-clip)en el clip-pathatributo.
+
 const createTile = () => svg`
   <g clip-path="url(#rect-clip)">
     <use transform="translate(0, 0)" href="#motif"></use>
@@ -58,6 +61,22 @@ const createTile = () => svg`
     <use transform="translate(100, 150)" href="#motif"></use>
   </g>
 `;
+// patternUnitspropiedad define la geometría de coordenadas relativa utilizada para pintar un patrón. 
+//El ajuste patternUnits hace userSpaceOnUseque la geometría sea relativa al espacio del usuario. 
+const createRepeatPattern = () => svg`
+  <pattern
+    id="repeat-pattern"
+    x="-10"
+    y="-10"
+    width="200"
+    height="200"
+    patternUnits="userSpaceOnUse">
+    ${createTile()}
+    
+
+  </pattern>
+`;
+//<pattern> elemento se puede asignar idy referenciar como fillen otros elementos SVG
 
 @customElement('repeat-pattern')
 export class RepeatPattern extends LitElement {
@@ -78,8 +97,11 @@ export class RepeatPattern extends LitElement {
             this.numPrints,
             this.rotationOffset,
           )}
+          ${createRepeatPattern()}
         </defs>
-            ${createTile()}
+    
+        <rect fill="#ffffff" height="100%" width="100%"></rect>
+        <rect fill="url(#repeat-pattern)" height="100%" width="100%"></rect>
       </svg>
     `;
   }
