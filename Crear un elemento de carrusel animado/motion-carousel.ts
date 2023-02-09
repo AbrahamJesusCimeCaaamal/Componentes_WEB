@@ -7,7 +7,7 @@ import {styles} from './styles.js';
 
 //animatedirectiva se encargará de animar el puesto. Es genial
 // para "interpolación" entre diferentes diseños renderizados.
-
+ //la animate directiva en realidad está animando la transform propiedad css. 
 @customElement('motion-carousel')
 export class MotionCarousel extends LitElement {
   static styles = styles;
@@ -20,7 +20,7 @@ export class MotionCarousel extends LitElement {
 
   @property({type: Number})
   selected = 0;
-  //la animate directiva en realidad está animando la transform propiedad css. 
+ 
 
   private left = 0;
   private selectedInternal = 0;
