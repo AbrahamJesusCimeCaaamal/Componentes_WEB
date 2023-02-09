@@ -1,12 +1,10 @@
-import type { SVGTemplateResult } from "lit";
+import type {SVGTemplateResult} from "lit";
 
-import { LitElement, html, svg } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import {LitElement, html, svg} from 'lit';
+import {customElement, property} from 'lit/decorators.js';
 
-// el <text> elemento in <defs>no tiene rotación. 
 const createElement = (chars: string): SVGTemplateResult => svg`
   <text
-  
     id="chars"
     dominant-basline="hanging"
     font-family="monospace"
@@ -14,11 +12,8 @@ const createElement = (chars: string): SVGTemplateResult => svg`
     ${chars}
   </text>
 `;
-
-// createMotifque genere una serie de textos rotados.
-// createMotifpodría tomar dos argumentos, numPrintsque
- //es el número de veces que se imprimirá el elemento, y una offsetpropiedad 
- //opcional que es el desplazamiento de rotación inicial.
+//Las rutas de recorte son polígonos que se utilizan para restringir dónde se 
+//"pintan" los elementos. En SVG, una ruta de clip se define con el <clipPath>elemento.
 
 const createMotif = (
   numPrints: number,
@@ -38,8 +33,31 @@ const createMotif = (
     `);
   }
 
-  return svg`<g transform="translate(50, 50)">${prints}</g>`;
+  return svg`
+    <g
+      id="motif"
+      transform="translate(50, 50)">
+        ${prints}
+    </g>
+  `;
 };
+
+const createTileBoundary = () => svg`
+  <clipPath id="rect-clip">
+    <rect width="200" height="200"></rect>
+  </clipPath>
+`;
+//Esta función utilizará el motivo y clipPath ahora 
+//disponibles al <defs>hacer referencia #motifen un <use>elemento y url(#rect-clip)en el clip-pathatributo.
+const createTile = () => svg`
+  <g clip-path="url(#rect-clip)">
+    <use transform="translate(0, 0)" href="#motif"></use>
+    <use transform="translate(0, 100)" href="#motif"></use>
+    <use transform="translate(100, -50)" href="#motif"></use>
+    <use transform="translate(100, 50)" href="#motif"></use>
+    <use transform="translate(100, 150)" href="#motif"></use>
+  </g>
+`;
 
 @customElement('repeat-pattern')
 export class RepeatPattern extends LitElement {
@@ -54,12 +72,14 @@ export class RepeatPattern extends LitElement {
     return html`
       <svg height="100%" width="100%">
         <defs>
+          ${createTileBoundary()}
           ${createElement(this.chars)}
+          ${createMotif(
+            this.numPrints,
+            this.rotationOffset,
+          )}
         </defs>
-        ${createMotif(
-          this.numPrints,
-          this.rotationOffset,
-        )}
+            ${createTile()}
       </svg>
     `;
   }
