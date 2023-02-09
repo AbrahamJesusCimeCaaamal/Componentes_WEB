@@ -1,24 +1,49 @@
 import type {SVGTemplateResult} from "lit";
 
-import {LitElement, html, svg} from 'lit';
+import {LitElement, html, svg, css} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 
+//CSS puede aplicar atributos de presentación a elementos
+// SVG de forma similar a como CSS aplica atributos a HTML.
+const themeCSS = css
+//CSS puede aplicar atributos de presentación a elementos SVG de forma similar a como CSS aplica atributos a HTML.
+`
+  .background {
+    fill: var(--background-color, #000000);
+  }
 
-//La patternUnits propiedad define la geometría de coordenadas 
-//relativa utilizada para pintar un patrón. El ajuste patternUnits 
-//hace userSpaceOnUse/que la geometría sea relativa al espacio del
-// usuario. En este caso, el espacio de usuario es el DOM.
-
-const createElement = (chars: string): SVGTemplateResult => svg`
-  <text
-    id="chars"
-    dominant-basline="hanging"
-    font-family="monospace"
-    font-size="24px">
-    ${chars}
-  </text>
+  text {
+    fill: var(--font-color, #ffffff);
+    font-size: var(--font-size, 26px);
+    stroke-width: var(--stroke-width, 1.2px);
+    stroke: var(--stroke-color, #eeeeee);
+  }
 `;
-//modificar llamados con cantidades
+//SVG también se puede diseñar con CSS Custom Properties. Esto permite a los artistas
+// y diseñadores crear un tema en un documento SVG con los mismos estilos que su homólogo HTML.
+
+const svgCSS = css`
+  :host {
+    display: block;
+  }
+
+  svg {
+    height: 100%;
+    width: 100%;
+  }
+
+  text {
+    fill: #ffffff;
+    dominant-baseline: hanging;
+    font-family: monospace;
+    font-size: 24px;
+  }
+`;
+// repeat-pattern elemento personalizado.
+const createElement = (chars: string): SVGTemplateResult => svg`
+  <text id="chars">${chars}</text>
+`;
+
 const createMotif = (
   numPrints: number,
   offset: number = 0,
@@ -61,8 +86,7 @@ const createTile = () => svg`
     <use transform="translate(100, 150)" href="#motif"></use>
   </g>
 `;
-// patternUnitspropiedad define la geometría de coordenadas relativa utilizada para pintar un patrón. 
-//El ajuste patternUnits hace userSpaceOnUseque la geometría sea relativa al espacio del usuario. 
+
 const createRepeatPattern = () => svg`
   <pattern
     id="repeat-pattern"
@@ -72,14 +96,13 @@ const createRepeatPattern = () => svg`
     height="200"
     patternUnits="userSpaceOnUse">
     ${createTile()}
-    
-
   </pattern>
 `;
-//<pattern> elemento se puede asignar idy referenciar como fillen otros elementos SVG
 
 @customElement('repeat-pattern')
 export class RepeatPattern extends LitElement {
+  static styles = [svgCSS, themeCSS];
+
   @property({type: String}) chars = "lit";
   @property({type: Number, attribute: "num-prints"}) numPrints = 7;
   @property({
@@ -89,7 +112,7 @@ export class RepeatPattern extends LitElement {
 
   render() {
     return html`
-      <svg height="100%" width="100%">
+      <svg>
         <defs>
           ${createTileBoundary()}
           ${createElement(this.chars)}
@@ -99,8 +122,8 @@ export class RepeatPattern extends LitElement {
           )}
           ${createRepeatPattern()}
         </defs>
-    
-        <rect fill="#ffffff" height="100%" width="100%"></rect>
+
+        <rect class="background" height="100%" width="100%"></rect>
         <rect fill="url(#repeat-pattern)" height="100%" width="100%"></rect>
       </svg>
     `;

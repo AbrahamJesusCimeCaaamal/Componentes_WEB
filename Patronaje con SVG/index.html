@@ -9,18 +9,29 @@
 
     <script type="module" src="repeat-pattern.js"></script>
     <style>
-      body {
-        height: 100vh;
-        margin: 0;
-      }
-
-      repeat-pattern {
-        height: 100vh;
-        width: 100vw;
-      }
-    </style>
+        body {
+          height: 100vh;
+          margin: 0;
+        }
+  
+        repeat-pattern {
+          height: 100vh;
+          width: 100vw;
+        }
+        
+        :root {
+          --background-color: #000000;
+          --font-color: #ffffff;
+          --font-size: 26px;
+          --stroke-width: 1.2px;
+          --stroke-color: #7acbf1;
+  
+          font-family: 'Open Sans', sans-serif;
+          font-size: 1.5em;
+        }
+      </style>
 </head>
 <body>
-    <repeat-pattern></repeat-pattern>
+    <repeat-pattern chars="lit" num-prints="7"></repeat-pattern>
 </body>
 </html>
