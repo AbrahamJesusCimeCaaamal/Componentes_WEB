@@ -5,9 +5,9 @@ import { customElement } from 'lit/decorators.js';
 // abreviada del equivalente JavaScript de llamar customElements.
 
 
+
 @customElement('word-viewer')
 class WordViewer extends LitElement {
-    //el static styles campo de clase utilizando la cssfunción de etiqueta.
   static styles = css`
     :host {
       background-color: white;
@@ -20,6 +20,7 @@ class WordViewer extends LitElement {
     }
   `;
 
+  @state() private playDirection: -1 | 1 = 1;
   @state() private idx = 0;
   @property() words = 'initial value';
 
@@ -27,6 +28,7 @@ class WordViewer extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    //tickToNextWord para elegir la siguiente palabra según el playDirection.
     this.intervalTimer = setInterval(this.tickToNextWord, 1000);
   }
 
@@ -35,12 +37,19 @@ class WordViewer extends LitElement {
     clearInterval(this.intervalTimer);
     this.intervalTimer = undefined;
   }
-
+//worden el render() método para dar cuenta de un negativo this.idx.
   render() {
     const splitWords = this.words.split('.');
-    const word = splitWords[this.idx % splitWords.length];
-    return html`<pre>${word}</pre>`;
+    const idx = ((this.idx % splitWords.length) + splitWords.length) % splitWords.length;
+    const word = splitWords[idx];
+    return html`<pre
+      @click=${this.switchPlayDirection}
+    >${word}</pre>`;
   }
-
-  tickToNextWord = () => { this.idx += 1; };
+// agregue un switchPlayDirectionmétodo para invertir el playDirection.
+  tickToNextWord = () => { this.idx += this.playDirection; };
+//enlace this.switchPlayDirection para invocar cuando se hace clic en el elemento <pre>
+  switchPlayDirection() {
+    this.playDirection *= -1;
+  }
 }
