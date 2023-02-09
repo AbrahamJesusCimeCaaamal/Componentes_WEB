@@ -4,12 +4,17 @@
 import {LitElement, html} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 
-//cambia el mi elemento mediante el DOM
+//cambia mi elemento mediante el DOM
+
 @customElement('my-element')
 export class MyElement extends LitElement {
+  //crear llamados de propiedades
+  @property()
+  message: string = 'Hello again.';
+
   render() {
     return html`
-      <p>Hello world! From my-element.</p>
+      <p>${this.message}</p>
     `;
   }
 }
