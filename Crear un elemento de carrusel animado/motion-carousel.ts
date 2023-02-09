@@ -2,15 +2,10 @@ import {LitElement, html, PropertyValues} from 'lit';
 import {customElement, property, query} from 'lit/decorators.js';
 import {styles} from './styles.js';
 import {styleMap} from 'lit/directives/style-map.js';
-
-//Las ranuras deben actualizarse para representar correctamente
-// los elementos seleccionados anteriormente y actualmente.
-
 @customElement('motion-carousel')
 export class MotionCarousel extends LitElement {
   static styles = styles;
- //El @querydecorador proporciona un acceso conveniente a los slotelementos.
- //Esto se usará para ver su archivo assignedElements.
+
   @query('slot[name="selected"]', true)
   private selectedSlot!: HTMLSlotElement;
 
@@ -31,12 +26,29 @@ export class MotionCarousel extends LitElement {
 
   private left = 0;
   render() {
-    if (this.hasValidSelected()) {
-      this.selectedInternal = this.selected;
-    }
-    const animateLeft = ``;
-    const selectedLeft = ``;
-    const previousLeft = ``;
+    const p = this.selectedInternal;
+    const s = (this.selectedInternal =
+      this.hasValidSelected() ? this.selected : this.selectedInternal);
+      //shouldMovese calcula en función del selectedInternalcambio de la propiedad 
+      //de seguimiento y el uso de la propiedad de ReactiveElement hasUpdatedpara evitar 
+      //animar el primer renderizado.
+    const shouldMove = this.hasUpdated && s !== p;
+    const atStart = p === 0;
+    const toStart = s === 0;
+    const atEnd = p === this.maxSelected;
+    const toEnd = s === this.maxSelected;
+    //shouldAdvancese calcula para que la posición avance si el elemento seleccionado aumenta, 
+    //con el posicionamiento invertido cuando se ajusta al principio o al final.
+    const shouldAdvance = shouldMove &&
+      (atEnd ? toStart : atStart ? !toEnd : s > p);
+      //delta se calcula en base a shouldMovey shouldAdvance.
+    const delta = (shouldMove ? Number(shouldAdvance) || -1 : 0) * 100;
+    this.left -= delta;
+    //left se almacena como una propiedad en el elemento,
+    const animateLeft = `${this.left}%`;
+    // El contenedor animado ( animateLeft) es la posición almacenada en left.
+    const selectedLeft = `${-this.left}%`;
+    const previousLeft = `${-this.left - delta}%`;
     return html`
       <div class="fit"
         @click=${this.clickHandler}
@@ -61,8 +73,6 @@ export class MotionCarousel extends LitElement {
   }
 
   private previous = 0;
-  //El updateSlotsmétodo elimina los elementos actualmente asignados y
-  // luego coloca los elementos para los valores previousy selected.
   protected updated(changedProperties: PropertyValues) {
     if (changedProperties.has('selected') && this.hasValidSelected()) {
       this.updateSlots();
