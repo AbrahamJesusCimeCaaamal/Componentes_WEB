@@ -1,7 +1,13 @@
-import {LitElement, html, PropertyValues} from 'lit';
+import {LitElement, html, PropertyValues, noChange} from 'lit';
 import {customElement, property, query} from 'lit/decorators.js';
-import {styles} from './styles.js';
+//importe la animate directiva del @lit-labs/motionpaquete
+import {animate} from '@lit-labs/motion';
 import {styleMap} from 'lit/directives/style-map.js';
+import {styles} from './styles.js';
+
+//animatedirectiva se encargará de animar el puesto. Es genial
+// para "interpolación" entre diferentes diseños renderizados.
+
 @customElement('motion-carousel')
 export class MotionCarousel extends LitElement {
   static styles = styles;
@@ -12,9 +18,12 @@ export class MotionCarousel extends LitElement {
   @query('slot[name="previous"]', true)
   private previousSlot!: HTMLSlotElement;
 
-  private selectedInternal = 0;
   @property({type: Number})
   selected = 0;
+  //la animate directiva en realidad está animando la transform propiedad css. 
+
+  private left = 0;
+  private selectedInternal = 0;
 
   get maxSelected() {
     return this.childElementCount - 1;
@@ -23,58 +32,51 @@ export class MotionCarousel extends LitElement {
   hasValidSelected() {
     return this.selected >= 0 && this.selected <= this.maxSelected;
   }
-
-  private left = 0;
+// la animatedirectiva al "contenedor" que rodea las ranuras en la returndeclaración del render
   render() {
     const p = this.selectedInternal;
     const s = (this.selectedInternal =
       this.hasValidSelected() ? this.selected : this.selectedInternal);
-      //shouldMovese calcula en función del selectedInternalcambio de la propiedad 
-      //de seguimiento y el uso de la propiedad de ReactiveElement hasUpdatedpara evitar 
-      //animar el primer renderizado.
     const shouldMove = this.hasUpdated && s !== p;
     const atStart = p === 0;
     const toStart = s === 0;
     const atEnd = p === this.maxSelected;
     const toEnd = s === this.maxSelected;
-    //shouldAdvancese calcula para que la posición avance si el elemento seleccionado aumenta, 
-    //con el posicionamiento invertido cuando se ajusta al principio o al final.
     const shouldAdvance = shouldMove &&
       (atEnd ? toStart : atStart ? !toEnd : s > p);
-      //delta se calcula en base a shouldMovey shouldAdvance.
     const delta = (shouldMove ? Number(shouldAdvance) || -1 : 0) * 100;
     this.left -= delta;
-    //left se almacena como una propiedad en el elemento,
     const animateLeft = `${this.left}%`;
-    // El contenedor animado ( animateLeft) es la posición almacenada en left.
     const selectedLeft = `${-this.left}%`;
     const previousLeft = `${-this.left - delta}%`;
+    const w = 100 / this.childElementCount;
+    const indicatorLeft = `${w * s}%`;
+    const indicatorWidth = `${w}%`;
     return html`
       <div class="fit"
+        ${animate()}
         @click=${this.clickHandler}
-        style=${styleMap({left: animateLeft})}
-      >
-        <div class="fit" style=${styleMap({left: previousLeft})}>
+        style=${styleMap({left: animateLeft})}>
+        <div class="fit" style=${
+          shouldMove ? styleMap({left: previousLeft}) : noChange
+        }>
           <slot name="previous"></slot>
         </div>
-        <div class="fit selected" style=${styleMap({left: selectedLeft})}>
+        <div class="fit selected" style=${
+          shouldMove ? styleMap({left: selectedLeft}) : noChange
+        }>
           <slot name="selected"></slot>
         </div>
       </div>
+      <div class="bar"><div class="indicator"
+          ${animate()}
+          style=${styleMap({left: indicatorLeft, width: indicatorWidth})}></div></div>
     `;
   }
 
-  private clickHandler(e: MouseEvent) {
-    const i = this.selected + (Number(!e.shiftKey) || -1);
-    this.selected = i > this.maxSelected ? 0 : i < 0 ? this.maxSelected : i;
-    const change = new CustomEvent('change',
-      {detail: this.selected, bubbles: true, composed: true});
-    this.dispatchEvent(change);
-  }
-
-  private previous = 0;
-  protected updated(changedProperties: PropertyValues) {
-    if (changedProperties.has('selected') && this.hasValidSelected()) {
+  private previous = -1;
+  protected async updated(changedProperties: PropertyValues) {
+    if ((changedProperties.has('selected') || this.previous === -1) && this.hasValidSelected()) {
       this.updateSlots();
       this.previous = this.selected;
     }
@@ -87,6 +89,14 @@ export class MotionCarousel extends LitElement {
     // set slots
     this.children[this.previous]?.setAttribute('slot', 'previous');
     this.children[this.selected]?.setAttribute('slot', 'selected');
+  }
+
+  private clickHandler(e: MouseEvent) {
+    const i = this.selected + (Number(!e.shiftKey) || -1);
+    this.selected = i > this.maxSelected ? 0 : i < 0 ? this.maxSelected : i;
+    const change = new CustomEvent('change',
+      {detail: this.selected, bubbles: true, composed: true});
+    this.dispatchEvent(change);
   }
 
 }
