@@ -1,58 +1,21 @@
+import { html, LitElement } from 'lit';
+import { customElement } from 'lit/decorators.js';
 
-//El word-viewercomponente toma una lista de palabras separadas por puntos y las muestra una a la vez.
-
-import { css, html, LitElement } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { classMap } from 'lit/directives/class-map.js';
+//El @customElement decorador de TypeScript es una forma
+// abreviada del equivalente JavaScript de llamar customElements.
 
 @customElement('word-viewer')
 class WordViewer extends LitElement {
-  static styles = css`
-    :host {
-      background-color: white;
-      color: violet;
-      cursor: pointer;
-      display: block;
-    }
-    pre {
-      padding: 0.2em;
-    }
-    .backwards {
-      color: white;
-      background-color: violet;
-    }
-  `
-
-  @state() private playDirection: -1 | 1 = 1;
-  @state() private idx = 0;
-  @property() words = 'initial value';
-
-  private intervalTimer?: number;
-
-  connectedCallback() {
-    super.connectedCallback();
-    this.intervalTimer = setInterval(this.tickToNextWord, 1000);
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    clearInterval(this.intervalTimer);
-    this.intervalTimer = undefined;
-  }
-
+    //render()devuelve una plantilla . Las plantillas iluminadas usan el html literal de
+    // la plantilla etiquetada para ejecutarse sin un paso de compilación en JavaScript.
   render() {
-    const splitWords = this.words.split('.');
-    const idx = ((this.idx % splitWords.length) + splitWords.length) % splitWords.length;
-    const word = splitWords[idx];
-    return html`<pre
-      class="${classMap({ backwards: this.playDirection === -1 })}"
-      @click=${this.switchPlayDirection}
-    >${word}</pre>`;
+    return html`<pre>A super expressive and efficient template!</pre>`
   }
+}
 
-  tickToNextWord = () => { this.idx += this.playDirection; };
-
-  switchPlayDirection() {
-    this.playDirection *= -1;
+declare global {
+    //permite a TypeScript inferir el tipo de document.createElement('word-viewer')su WordViewerclase.
+  interface HTMLElementTagNameMap {
+    "word-viewer": WordViewer
   }
 }
