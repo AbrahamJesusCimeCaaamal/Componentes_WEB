@@ -1,34 +1,65 @@
-
-
-//El elemento en esta demostración será una sola pieza de texto. Podemos crear texto en SVG y Lit con plantillas SVG 
-
 import type { SVGTemplateResult } from "lit";
 
 import { LitElement, html, svg } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-//createElementque genere un <text>elemento con texto de visualización configurable usando una 
-//plantilla Lit SVG. Agregue atributos de estilo específicos de texto al <text>elemento.
+// el <text> elemento in <defs>no tiene rotación. 
 const createElement = (chars: string): SVGTemplateResult => svg`
   <text
-    dominant-baseline="hanging"
+  
+    id="chars"
+    dominant-basline="hanging"
     font-family="monospace"
     font-size="24px">
     ${chars}
   </text>
 `;
 
+// createMotifque genere una serie de textos rotados.
+// createMotifpodría tomar dos argumentos, numPrintsque
+ //es el número de veces que se imprimirá el elemento, y una offsetpropiedad 
+ //opcional que es el desplazamiento de rotación inicial.
+
+const createMotif = (
+  numPrints: number,
+  offset: number = 0,
+): SVGTemplateResult => {
+  const rotation = 360 / numPrints;
+
+  const prints = [];
+  let currRotation = offset;
+  for (let index = 0; index < numPrints; index++) {
+    currRotation += rotation;
+    prints.push(svg`
+      <use
+        href="#chars"
+        transform="rotate(${currRotation}, 0, 0)">
+      </use>
+    `);
+  }
+
+  return svg`<g transform="translate(50, 50)">${prints}</g>`;
+};
+
 @customElement('repeat-pattern')
-export class RepeatPattern extends LitElement {    
+export class RepeatPattern extends LitElement {
   @property({type: String}) chars = "lit";
-  
-  //una plantilla SVG debe ser hija de un <svg>elemento. 
-  //El <svg> elemento debe estar contenido dentro de una plantilla HTML
+  @property({type: Number, attribute: "num-prints"}) numPrints = 7;
+  @property({
+    type: Number,
+    attribute: "rotation-offset",
+  }) rotationOffset = 0;
+
   render() {
-    //createElement la render() función de un repeat-pattern componente.
     return html`
       <svg height="100%" width="100%">
-        ${createElement(this.chars)}
+        <defs>
+          ${createElement(this.chars)}
+        </defs>
+        ${createMotif(
+          this.numPrints,
+          this.rotationOffset,
+        )}
       </svg>
     `;
   }
