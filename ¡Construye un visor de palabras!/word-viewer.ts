@@ -5,17 +5,13 @@ import { customElement } from 'lit/decorators.js';
 // abreviada del equivalente JavaScript de llamar customElements.
 
 @customElement('word-viewer')
+//propiedades reactivas de Lit son propiedades especiales
+// que pueden interactuar con el ciclo de vida de renderizado de Lit.
 class WordViewer extends LitElement {
-    //render()devuelve una plantilla . Las plantillas iluminadas usan el html literal de
-    // la plantilla etiquetada para ejecutarse sin un paso de compilación en JavaScript.
+  @property() words = 'initial value';
+//el componente programa una actualización. De forma predeterminada, Lit configura la sincronización de
+// atributos para la propiedad y actualizará la propiedad cuando cambie el atributo.
   render() {
-    return html`<pre>A super expressive and efficient template!</pre>`
-  }
-}
-
-declare global {
-    //permite a TypeScript inferir el tipo de document.createElement('word-viewer')su WordViewerclase.
-  interface HTMLElementTagNameMap {
-    "word-viewer": WordViewer
+    return html`<pre>${this.words}</pre>`
   }
 }
