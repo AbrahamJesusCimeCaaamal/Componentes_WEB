@@ -4,13 +4,17 @@ import {customElement, property} from 'lit/decorators.js';
 @customElement('date-display')
 export class DateDisplay extends LitElement {
   @property({attribute: false})
-  //date la propiedad de su componente todavía se configura con JavaScript
   date = new Date();
-//dateStr propiedad que podría configurarse a partir de un atributo
+//dateStr, que acepta una cadena.
   @property({type: String, attribute: 'date-str'})
   dateStr = '';
+//willUpdate es un poco desordenado e imperativo.
+  willUpdate(changed: PropertyValues<this>) {
+    if (changed.has('dateStr') && this.dateStr) {
+      this.date = new Date(this.dateStr);
+    }
+  }
 
-  //El willUpdate método es un buen lugar para reconciliar dos propiedades reactivas diferentes.
   render() {
     const locale = 'en-US';
     const options: Intl.DateTimeFormatOptions =
